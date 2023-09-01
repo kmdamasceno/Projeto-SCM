@@ -43,6 +43,32 @@ def writeAccountsFile(account):
     outfile.close()
     os.rename(NEW_ACCOUNTS_DATA_PATH, ACCOUNTS_DATA_PATH)
 
+def depositAndWithdraw(num1, num2):
+    file = pathlib.Path(ACCOUNTS_DATA_PATH)
+    if file.exists():
+        infile = open(ACCOUNTS_DATA_PATH, "rb")
+        mylist = pickle.load(infile)
+        infile.close()
+        os.remove(ACCOUNTS_DATA_PATH)
+        for item in mylist:
+            if item.accNo == num1:
+                if num2 == 1:
+                    amount = int(input("\tEnter the amount to deposit: "))
+                    item.deposit += amount
+                    print("\tYour account is updated.")
+                elif num2 == 2:
+                    amount = int(input("\tEnter the amount to withdraw: "))
+                    if amount <= item.deposit:
+                        item.deposit -= amount
+                    else:
+                        print("\tYou cannot withdraw larger amount.")
+    else:
+        print("\tNo records to search.")
+    outfile = open(NEW_ACCOUNTS_DATA_PATH, "wb")
+    pickle.dump(mylist, outfile)
+    outfile.close()
+    os.rename(NEW_ACCOUNTS_DATA_PATH, ACCOUNTS_DATA_PATH)
+
 
 if __name__ == "__main__":
     print("\n")
@@ -69,10 +95,10 @@ if __name__ == "__main__":
             writeAccount()
         elif ch == "2":
             num = int(input("\n\tEnter the account number: "))
-            pass
+            depositAndWithdraw(num, 1)
         elif ch == "3":
             num = int(input("\n\tEnter the account number: "))
-            pass
+            depositAndWithdraw(num, 2)
         elif ch == "4":
             num = int(input("\n\tEnter the account number: "))
             pass
