@@ -69,6 +69,22 @@ def depositAndWithdraw(num1, num2):
     outfile.close()
     os.rename(NEW_ACCOUNTS_DATA_PATH, ACCOUNTS_DATA_PATH)
 
+def displaySp(num):
+    file = pathlib.Path(ACCOUNTS_DATA_PATH)
+    if file.exists():
+        infile = open(ACCOUNTS_DATA_PATH, "rb")
+        mylist = pickle.load(infile)
+        infile.close()
+        found = False
+        for item in mylist:
+            if item.accNo == num:
+                print("\tYour account balance is = ", item.deposit)
+                found = True
+    else:
+        print("\tNo records to search.")
+    if not found:
+        print("\tNo existing record with this number.")
+
 
 if __name__ == "__main__":
     print("\n")
@@ -101,7 +117,7 @@ if __name__ == "__main__":
             depositAndWithdraw(num, 2)
         elif ch == "4":
             num = int(input("\n\tEnter the account number: "))
-            pass
+            displaySp(num)
         elif ch == "5":
             print("\n")
             pass
