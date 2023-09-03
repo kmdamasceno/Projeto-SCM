@@ -85,6 +85,17 @@ def displaySp(num):
     if not found:
         print("\tNo existing record with this number.")
 
+def displayAll():
+    file = pathlib.Path(ACCOUNTS_DATA_PATH)
+    if file.exists():
+        infile = open(ACCOUNTS_DATA_PATH, "rb")
+        mylist = pickle.load(infile)
+        for item in mylist:
+            print("\t", item.accNo, " ", item.name, " ", item.type, " ", item.deposit)
+        infile.close()
+    else:
+        print("\tNo records to display.")
+
 
 if __name__ == "__main__":
     print("\n")
@@ -120,7 +131,7 @@ if __name__ == "__main__":
             displaySp(num)
         elif ch == "5":
             print("\n")
-            pass
+            displayAll()
         elif ch == "6":
             num = int(input("\n\tEnter the account number: "))
             pass
