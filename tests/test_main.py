@@ -1,4 +1,4 @@
-import main as main
+import src.main as main
 import pytest
 
 main.ACCOUNTS_DATA_PATH = "test_accounts.data"
@@ -67,8 +67,7 @@ class TestAccount:
         monkeypatch.undo()
         assert test_account.deposit == 1000
 
-    def test_displaySp(self, capfd: CaptureFixture[str]):
+    def test_displaySp(self, capfd):
         main.displaySp(test_account.accNo)
         out, err = capfd.readouterr()
         assert out == f"\tYour account balance is =  {test_account.deposit}\n"
-        
