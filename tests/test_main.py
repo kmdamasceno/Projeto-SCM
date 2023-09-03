@@ -1,4 +1,4 @@
-from main import main
+from src.main import Account, writeAccount, writeAccountsFile, depositAndWithdraw, displaySp
 import pytest
 
 main.ACCOUNTS_DATA_PATH = "test_accounts.data"
