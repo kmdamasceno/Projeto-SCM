@@ -3,8 +3,8 @@ import os
 import pathlib
 
 
-ACCOUNTS_DATA_PATH = "accounts.data"
-NEW_ACCOUNTS_DATA_PATH = "new_accounts.data"
+ACCOUNTS_DATA_PATH = "src/accounts.data"
+NEW_ACCOUNTS_DATA_PATH = "src/new_accounts.data"
 
 
 class Account:
@@ -45,6 +45,7 @@ def writeAccountsFile(account):
 
 def depositAndWithdraw(num1, num2):
     file = pathlib.Path(ACCOUNTS_DATA_PATH)
+    mylist = []
     if file.exists():
         infile = open(ACCOUNTS_DATA_PATH, "rb")
         mylist = pickle.load(infile)
@@ -71,11 +72,11 @@ def depositAndWithdraw(num1, num2):
 
 def displaySp(num):
     file = pathlib.Path(ACCOUNTS_DATA_PATH)
+    found = False
     if file.exists():
         infile = open(ACCOUNTS_DATA_PATH, "rb")
         mylist = pickle.load(infile)
         infile.close()
-        found = False
         for item in mylist:
             if item.accNo == num:
                 print("\tYour account balance is = ", item.deposit)
