@@ -97,6 +97,39 @@ def displayAll():
     else:
         print("\tNo records to display.")
 
+def deleteAccount(num):
+    file = pathlib.Path(ACCOUNTS_DATA_PATH)
+    if file.exists():
+        infile = open(ACCOUNTS_DATA_PATH, "rb")
+        oldlist = pickle.load(infile)
+        infile.close()
+        newlist = []
+        for item in oldlist:
+            if item.accNo != num:
+                newlist.append(item)
+        os.remove(ACCOUNTS_DATA_PATH)
+        outfile = open(NEW_ACCOUNTS_DATA_PATH, "wb")
+        pickle.dump(newlist, outfile)
+        outfile.close()
+        os.rename(NEW_ACCOUNTS_DATA_PATH, ACCOUNTS_DATA_PATH)
+
+def modifyAccount(num):
+    file = pathlib.Path(ACCOUNTS_DATA_PATH)
+    if file.exists():
+        infile = open(ACCOUNTS_DATA_PATH, "rb")
+        oldlist = pickle.load(infile)
+        infile.close()
+        os.remove(ACCOUNTS_DATA_PATH)
+        for item in oldlist:
+            if item.accNo == num:
+                item.name = input("\tEnter the account holder name: ")
+                item.type = input("\tEnter the account type: ")
+                item.deposit = int(input("\tEnter the amount: "))
+        outfile = open(NEW_ACCOUNTS_DATA_PATH, "wb")
+        pickle.dump(oldlist, outfile)
+        outfile.close()
+        os.rename(NEW_ACCOUNTS_DATA_PATH, ACCOUNTS_DATA_PATH)
+
 
 if __name__ == "__main__":
     print("\n")
@@ -135,10 +168,10 @@ if __name__ == "__main__":
             displayAll()
         elif ch == "6":
             num = int(input("\n\tEnter the account number: "))
-            pass
+            deleteAccount(num)
         elif ch == "7":
             num = int(input("\n\tEnter the account number: "))
-            pass
+            modifyAccount(num)
         elif ch == "8":
             print("\n\tThanks for using Bank Management System.")
             break

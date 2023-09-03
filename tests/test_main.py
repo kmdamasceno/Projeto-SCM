@@ -34,22 +34,6 @@ class TestAccount:
         main.ACCOUNTS_DATA_PATH = "tests/test_accounts.data"
         main.NEW_ACCOUNTS_DATA_PATH = "tests/test_new_accounts.data"
 
-    def test_createInstance(self):
-        assert isinstance(test_account, main.Account) == True
-
-    def test_createAccount(self):
-        expected = (123, "Leopoldo", "S", 1000)
-        inputs = iter(expected)
-        monkeypatch = pytest.MonkeyPatch()
-        monkeypatch.setattr('builtins.input', lambda _: next(inputs))
-        test_account.createAccount()
-        monkeypatch.undo()
-        actual = (test_account.accNo,
-                  test_account.name,
-                  test_account.type,
-                  test_account.deposit)
-        assert actual == expected
-
     @staticmethod
     def check_account_exists(num):
         file = main.pathlib.Path(main.ACCOUNTS_DATA_PATH)
@@ -63,8 +47,36 @@ class TestAccount:
                     found = True
         return found
 
-    def test_writeAccountsFile(self):
-        main.writeAccountsFile(test_account)
+    @staticmethod
+    def get_updated_attributes(num):
+        file = main.pathlib.Path(main.ACCOUNTS_DATA_PATH)
+        if file.exists():
+            infile = open(main.ACCOUNTS_DATA_PATH, "rb")
+            mylist = main.pickle.load(infile)
+            infile.close()
+            deposit = 0
+            for item in mylist:
+                if item.accNo == num:
+                    name = item.name
+                    type = item.type
+                    deposit = item.deposit
+        return name, type, deposit
+
+    def test_writeAccount(self):
+        expected = (123, "Leopoldo", "S", 1000)
+        inputs = iter(expected)
+        monkeypatch = pytest.MonkeyPatch()
+        monkeypatch.setattr('builtins.input', lambda _: next(inputs))
+        main.writeAccount()
+        monkeypatch.undo()
+        test_account.accNo = expected[0]
+        test_account.name, test_account.type, test_account.deposit = TestAccount.get_updated_attributes(test_account.accNo)
+        actual = (test_account.accNo,
+                  test_account.name,
+                  test_account.type,
+                  test_account.deposit)
+        assert isinstance(test_account, main.Account) == True
+        assert actual == expected
         assert TestAccount.check_account_exists(test_account.accNo) == True
 
     def test_writeAccountsFile_fileDontExist(self):
@@ -74,27 +86,14 @@ class TestAccount:
         TestAccount.delete_no_exist_file()
         TestAccount.unchange_accounts_file_name()
 
-    @staticmethod
-    def get_updated_deposit(num):
-        file = main.pathlib.Path(main.ACCOUNTS_DATA_PATH)
-        if file.exists():
-            infile = open(main.ACCOUNTS_DATA_PATH, "rb")
-            mylist = main.pickle.load(infile)
-            infile.close()
-            deposit = 0
-            for item in mylist:
-                if item.accNo == num:
-                    deposit = item.deposit
-        return deposit
-
     @pytest.mark.parametrize('amount, option, expected', [(500, 1, 1500),
                                                           (500, 2, 1000)])
     def test_depositAndWithdraw_regularOperation(self, amount, option, expected):
         monkeypatch = pytest.MonkeyPatch()
         monkeypatch.setattr('builtins.input', lambda _: amount)
         main.depositAndWithdraw(test_account.accNo, option)
-        test_account.deposit = TestAccount.get_updated_deposit(test_account.accNo)
         monkeypatch.undo()
+        test_account.deposit = TestAccount.get_updated_attributes(test_account.accNo)[2]
         assert test_account.deposit == expected
 
     def test_depositAndWithdraw_largerAmount(self, capfd):
@@ -102,8 +101,8 @@ class TestAccount:
         monkeypatch = pytest.MonkeyPatch()
         monkeypatch.setattr('builtins.input', lambda _: 2000)
         main.depositAndWithdraw(test_account.accNo, 2)
-        out, err = capfd.readouterr()
         monkeypatch.undo()
+        out, err = capfd.readouterr()
         assert out == expected
 
     def test_depositAndWithdraw_fileDontExist(self, capfd):
@@ -150,3 +149,29 @@ class TestAccount:
         TestAccount.unchange_accounts_file_name()
         out, err = capfd.readouterr()
         assert out == expected
+    
+    def test_modifyAccount(self):
+        expected = ("Motta", "C", 2000)
+        inputs = iter(expected)
+        monkeypatch = pytest.MonkeyPatch()
+        monkeypatch.setattr('builtins.input', lambda _: next(inputs))
+        main.modifyAccount(test_account.accNo)
+        monkeypatch.undo()
+        test_account.name, test_account.type, test_account.deposit = TestAccount.get_updated_attributes(test_account.accNo)
+        actual = (test_account.name,
+                  test_account.type,
+                  test_account.deposit)
+        assert actual == expected
+
+    def test_deleteAccount(self):
+        test_account_2 = main.Account()
+        entry = (321, "Leopoldo", "S", 1000)
+        inputs = iter(entry)
+        monkeypatch = pytest.MonkeyPatch()
+        monkeypatch.setattr('builtins.input', lambda _: next(inputs))
+        test_account_2.createAccount()
+        main.writeAccountsFile(test_account_2)
+        monkeypatch.undo()
+        main.deleteAccount(test_account.accNo)
+        assert TestAccount.check_account_exists(test_account.accNo) == False
+        assert TestAccount.check_account_exists(test_account_2.accNo) == True
