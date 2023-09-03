@@ -1,5 +1,5 @@
-from src.main import Account
-import pytest
+import src.main
+import pytesta
 
 main.ACCOUNTS_DATA_PATH = "test_accounts.data"
 main.NEW_ACCOUNTS_DATA_PATH = "test_new_accounts.data"
