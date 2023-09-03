@@ -1,4 +1,4 @@
-from src.main import main
+from src.main import Account
 import pytest
 
 main.ACCOUNTS_DATA_PATH = "test_accounts.data"
